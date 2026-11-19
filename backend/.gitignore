@@ -1,0 +1,9 @@
+target/
+nbproject/private/
+nb-configuration.xml
+*.iml
+.idea/
+
+# Credenciales: nunca al repositorio
+src/main/resources/config.properties
+config.properties
