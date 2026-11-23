@@ -62,7 +62,7 @@ public class PreciosService {
         return new Resumen(combustible, promedio, minimo, maximo, miPrecio, diferencia, (int) stats.getCount());
     }
 
-    static double haversineKm(double lat1, double lng1, double lat2, double lng2) {
+    public static double haversineKm(double lat1, double lng1, double lat2, double lng2) {
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
