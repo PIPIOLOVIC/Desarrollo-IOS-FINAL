@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 
 /**
  * POST /api/admin/actualizar: corre el colector de la CNE a mano (pruebas y demo).
+ * Con base de datos configurada, admin.token es obligatorio (si falta: 500).
  * Si admin.token está configurado, hay que mandar el encabezado X-Admin-Token.
  */
 @Path("/admin")
@@ -26,6 +27,10 @@ public class AdminResource {
     public ResultadoActualizacion actualizar(@HeaderParam("X-Admin-Token") String token,
                                              @QueryParam("origen") String origen) {
         String esperado = Config.adminToken();
+        // Con base real el endpoint descarga y escribe: no se deja abierto sin token.
+        if (esperado == null && Config.hayBaseDeDatos()) {
+            throw new ApiException(Response.Status.INTERNAL_SERVER_ERROR, "Configura admin.token para usar este endpoint");
+        }
         if (esperado != null && !iguales(esperado, token)) {
             throw new ApiException(Response.Status.UNAUTHORIZED, "Falta o no es válido el encabezado X-Admin-Token");
         }
