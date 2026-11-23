@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<places>
+  <place place_id="2039">
+    <name>ESTACION HIPODROMO SA DE CV</name>
+    <cre_id>PL/658/EXP/ES/2015</cre_id>
+    <location>
+      <x>-116.9214</x>
+      <y>32.47641</y>
+    </location>
+  </place>
+  <place place_id="2725">
+    <name>ESTACION DE SERVICIO LA PIEDAD SA DE CV</name>
+    <cre_id>PL/1395/EXP/ES/2015</cre_id>
+    <location>
+      <x>-102.0362</x>
+      <y>20.34909</y>
+    </location>
+  </place>
+  <place place_id="4554">
+    <name>AUTOSERVICIO EL FUERTE SA DE CV</name>
+    <cre_id>PL/2810/EXP/ES/2015</cre_id>
+    <location>
+      <x>-102.066</x>
+      <y>20.3592</y>
+    </location>
+  </place>
+  <place place_id="9444">
+    <name>TECNI SERVICIO AUTOMOTRIZ DEL CENTRO SA DE CV</name>
+    <cre_id>PL/8668/EXP/ES/2015</cre_id>
+    <location>
+      <x>-102.0293</x>
+      <y>20.34763</y>
+    </location>
+  </place>
+  <place place_id="9453">
+    <name>SUPERSERVICIO TERECAR SA DE CV</name>
+    <cre_id>PL/8251/EXP/ES/2015</cre_id>
+    <location>
+      <x>-102.2814</x>
+      <y>21.84588</y>
+    </location>
+  </place>
+  <place place_id="10473">
+    <name>CONSORCIO GASOLINERO ISTMO AMERICANO SA DE CV</name>
+    <cre_id>PL/9599/EXP/ES/2015</cre_id>
+    <location>
+      <x>-94.42896</x>
+      <y>18.15451</y>
+    </location>
+  </place>
+  <place place_id="11697">
+    <name>LOS CAFETOS DE FORTIN SA DE CV</name>
+    <cre_id>PL/9993/EXP/ES/2015</cre_id>
+    <location>
+      <x>-96.98308</x>
+      <y>18.90257</y>
+    </location>
+  </place>
+  <place place_id="13014">
+    <name>BARCEL, S.A. DE C.V.</name>
+    <cre_id>PL/11633/EXP/ESA/2015</cre_id>
+    <location>
+      <x>0</x>
+      <y>0</y>
+    </location>
+  </place>
+</places>
