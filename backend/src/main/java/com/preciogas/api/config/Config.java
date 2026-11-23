@@ -68,9 +68,9 @@ public final class Config {
         }
     }
 
-    /** true si hay datos de conexión a la base; si no, la API usa datos de ejemplo. */
+    /** true si hay datos de conexión a la base (db.url o db.host); si no, la API usa datos de ejemplo. */
     public static boolean hayBaseDeDatos() {
-        return get("db.url", null) != null;
+        return get("db.url", null) != null || get("db.host", null) != null;
     }
 
     /** Ubicación de nuestra gasolinera (centro para /resumen y valor por omisión de /competencia). */
