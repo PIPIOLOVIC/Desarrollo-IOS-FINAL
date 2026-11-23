@@ -7,6 +7,7 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
@@ -22,12 +23,17 @@ public class AdminResource {
 
     @POST
     @Path("/actualizar")
-    public ResultadoActualizacion actualizar(@HeaderParam("X-Admin-Token") String token) {
+    public ResultadoActualizacion actualizar(@HeaderParam("X-Admin-Token") String token,
+                                             @QueryParam("origen") String origen) {
         String esperado = Config.adminToken();
         if (esperado != null && !iguales(esperado, token)) {
             throw new ApiException(Response.Status.UNAUTHORIZED, "Falta o no es válido el encabezado X-Admin-Token");
         }
-        return Colector.ejecutar();
+        // origen=archivo: no descarga, usa el archivo de respaldo del servidor
+        if (origen != null && !origen.equals("archivo")) {
+            throw ApiException.badRequest("origen no válido: " + origen + " (usa origen=archivo o no lo mandes)");
+        }
+        return Colector.ejecutar(origen != null);
     }
 
     /** Comparación en tiempo constante para no filtrar el token por tiempos de respuesta. */

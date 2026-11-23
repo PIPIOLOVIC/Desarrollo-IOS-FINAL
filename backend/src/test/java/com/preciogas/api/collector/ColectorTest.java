@@ -24,6 +24,12 @@ class ColectorTest {
     }
 
     @Test
+    void elRespaldoIncluidoEnLaWarSeLee() throws Exception {
+        assertEquals(15050, CneParser.leerLugares(new java.io.ByteArrayInputStream(Colector.leerRespaldo("places"))).size());
+        assertEquals(13843, CneParser.leerPrecios(new java.io.ByteArrayInputStream(Colector.leerRespaldo("prices"))).size());
+    }
+
+    @Test
     void descartaPreciosAbsurdosYEstacionesSinPrecio() throws Exception {
         // Radio enorme: todo México. 13014 (0,0 y sin precio) no entra; a 10473 se le quita el diesel de 0.01.
         List<Estacion> todas = Colector.unir(CneParserTest.lugares(), CneParserTest.precios(), 20.34, -102.03, 5000, null);
