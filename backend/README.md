@@ -2,7 +2,7 @@
 
 API REST en Java para la app PrecioGas: Maven web, JAX-RS (Jersey 3.1), Jackson, Tomcat 10.1 y TiDB (driver MySQL).
 
-**Estado actual:** los 6 endpoints del contrato y `/api/salud` responden con **datos de ejemplo en memoria** (no son datos reales). Lo que falta: conectar TiDB (`JdbcDao`) y el colector de la CNE.
+**Estado actual:** los endpoints de lectura y `/mis-precios` responden con **datos de ejemplo en memoria** (no son datos reales) hasta que exista `JdbcDao`. El colector de la CNE ya guarda datos reales en TiDB (`POST /api/admin/actualizar`, ver abajo).
 
 ## Requisitos
 
@@ -29,10 +29,63 @@ http://localhost:8080/api/salud
 
 ## Configuración (base de datos)
 
-1. Copia `config.example.properties` a `src/main/resources/config.properties` (ignorado por Git) y llena host, usuario y contraseña de TiDB Cloud. También funcionan variables de entorno: `PRECIOGAS_DB_URL`, `PRECIOGAS_DB_USER`, `PRECIOGAS_DB_PASSWORD`.
+1. Copia `config.example.properties` a `src/main/resources/config.properties` (ignorado por Git) y llena `db.host`, `db.user`, `db.password` (TiDB Cloud: `db.port=4000`, `db.ssl=true`), `admin.token` y los datos de tu gasolinera (`mi.lat`, `mi.lng`, `mi.permiso`).
 2. Corre `schema.sql` en la consola SQL de TiDB para crear `estacion`, `precio` y `mi_precio`.
 
-Sin `db.url` la API usa los datos de ejemplo.
+Sin `db.host` (ni `db.url`) la API usa los datos de ejemplo. En código, la conexión se abre con `Db.abrir()` (paquete `config`); si falla, lanza un error claro sin host, usuario ni contraseña.
+
+Las pruebas (`mvnw test`) **no** leen tu `config.properties`: usan `src/test/resources/config-pruebas.properties` (sin base), así que siempre corren con datos de ejemplo.
+
+### Variables de entorno (Render)
+
+Cada clave de `config.properties` se puede dar como variable `PRECIOGAS_` + la clave en mayúsculas con `_` en vez de punto. Las variables ganan sobre el archivo.
+
+| Variable | Ejemplo / por omisión | Para qué |
+|---|---|---|
+| `PRECIOGAS_DB_HOST` | `gateway01.us-east-1.prod.aws.tidbcloud.com` | Host de TiDB (sin él: datos de ejemplo) |
+| `PRECIOGAS_DB_PORT` | `4000` | Puerto |
+| `PRECIOGAS_DB_NAME` | `preciogas` | Base de datos |
+| `PRECIOGAS_DB_SSL` | `false` (en TiDB Cloud: `true`) | TLS con `sslMode=VERIFY_IDENTITY` |
+| `PRECIOGAS_DB_USER` / `PRECIOGAS_DB_PASSWORD` | | Credenciales |
+| `PRECIOGAS_ADMIN_TOKEN` | | Obligatorio con base para `/admin/actualizar` |
+| `PRECIOGAS_MI_LAT` / `PRECIOGAS_MI_LNG` | `20.90` / `-101.30` (ejemplo) | Ubicación de nuestra gasolinera |
+| `PRECIOGAS_MI_PERMISO` | | Permiso CNE de nuestra gasolinera (no se guarda como competencia) |
+| `PRECIOGAS_CNE_RADIO_KM` | `100` | Radio de carga del colector |
+| `PRECIOGAS_ZONA` | `America/Mexico_City` | Zona horaria de las fechas |
+
+## Colector de la CNE
+
+Fuente: los XML públicos de la CNE (antes CRE) `https://publicacionexterna.azurewebsites.net/publicaciones/places` (estaciones: `place_id`, nombre/razón social, permiso `cre_id`, coordenadas) y `.../prices` (precios por `place_id`: `regular`, `premium`, `diesel`). No traen marca, municipio, estado ni fecha.
+
+Qué hace `POST /api/admin/actualizar`:
+
+1. Descarga los dos archivos (unos 3 MB cada uno, de 10 a 40 s). Si la descarga falla, usa el respaldo: `cne.archivo.places` / `cne.archivo.prices` si están configurados, o la copia incluida en la WAR (`src/main/resources/cne/*.xml.gz`, del 23 nov 2026).
+2. Une estaciones y precios por `place_id` y mapea `regular` → `magna`.
+3. Se queda con las estaciones a `cne.radio.km` (100 km) o menos de `mi.lat`/`mi.lng`, sin la propia (`mi.permiso`), y descarta precios fuera de 15–40 $/L (errores de captura).
+4. Guarda en una transacción: `estacion` por permiso (`INSERT ... ON DUPLICATE KEY UPDATE`, con `actualizado = NOW()`) y una fila de `precio` por estación, combustible y día (historial). Correrlo dos veces el mismo día actualiza el precio de ese día; no duplica.
+5. Responde `{"estaciones": n, "precios": n}` y deja en el log de Tomcat una línea `[Colector] origen=... descarga=...s parseo=...s carga=...s ...`.
+
+Reglas:
+
+- Con base configurada, `admin.token` es **obligatorio** (sin él: 500) y hay que mandar el encabezado `X-Admin-Token` (si no coincide: 401).
+- Si `mi.lat`/`mi.lng` siguen en los valores de ejemplo (20.90/-101.30), no carga y responde 500 con el motivo.
+- La fecha de los precios es el día de la carga (zona `America/Mexico_City`), porque la CNE no publica fecha.
+
+```powershell
+# Descargar de la CNE y cargar
+curl.exe -X POST -H "X-Admin-Token: <tu token>" http://localhost:8080/api/admin/actualizar
+# Usar el archivo de respaldo, sin descargar
+curl.exe -X POST -H "X-Admin-Token: <tu token>" "http://localhost:8080/api/admin/actualizar?origen=archivo"
+```
+
+Para revisar la carga en la consola de TiDB:
+
+```sql
+SELECT COUNT(*) FROM estacion;
+SELECT fecha, combustible, COUNT(*), ROUND(AVG(precio), 2) FROM precio GROUP BY fecha, combustible;
+```
+
+No hay descarga programada: en el plan gratuito de Render el servicio se apaga por inactividad, así que el colector se corre a mano con el endpoint.
 
 ## Contrato
 
@@ -46,7 +99,7 @@ Base `http://<host>:8080/api`, JSON UTF-8, fechas ISO 8601, precios en pesos por
 | GET | `/mis-precios` | Mis precios, del más reciente al más antiguo |
 | POST | `/mis-precios` | Cuerpo `{"combustible":"magna","precio":23.50}` → 201 con el registro |
 | PUT | `/mis-precios/{id}` | Cuerpo `{"precio":23.60}` → 200 con el registro, 404 si no existe |
-| POST | `/admin/actualizar` | Corre el colector → `{"estaciones":n,"precios":n}`. Si `admin.token` está configurado, pide el encabezado `X-Admin-Token` (401 si falta) |
+| POST | `/admin/actualizar` | Corre el colector → `{"estaciones":n,"precios":n}`. Pide el encabezado `X-Admin-Token` si `admin.token` está configurado (401 si falta); con base, `admin.token` es obligatorio. `?origen=archivo` usa el respaldo |
 
 Los cuerpos JSON pueden traer campos de más (por ejemplo `id` o `fecha`): se ignoran. La fecha de un precio nuevo la pone el servidor con la zona `America/Mexico_City`.
 
@@ -62,9 +115,9 @@ curl.exe -X POST -H "Content-Type: application/json" -d '{\"combustible\":\"magn
 
 ## Estructura (`com.preciogas.api`)
 
-- `config`: `ApiApplication` (`/api`), configuración de Jackson y lectura de `config.properties`.
+- `config`: `ApiApplication` (`/api`), configuración de Jackson, lectura de `config.properties` (`Config`) y conexión a la base (`Db`).
 - `resource`: un recurso por endpoint y `ErrorMapper` para el formato de errores.
 - `service`: `PreciosService` (filtro por radio con Haversine y cálculo del resumen).
 - `dao`: interfaz `PreciosDao`; `EjemploDao` en memoria (luego `JdbcDao` para TiDB).
 - `model`: `Estacion`, `MiPrecio`, `Resumen`, `Competencia`, etc.
-- `collector`: colector de la CNE (pendiente).
+- `collector`: colector de la CNE: `CneClient` (descarga), `CneParser` (StAX), `Colector` (une, filtra, respaldo) y `CargaCne` (guarda en TiDB).
