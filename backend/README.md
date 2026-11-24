@@ -36,6 +36,24 @@ Sin `db.host` (ni `db.url`) la API usa los datos de ejemplo. En código, la cone
 
 Las pruebas (`mvnw test`) **no** leen tu `config.properties`: usan `src/test/resources/config-pruebas.properties` (sin base), así que siempre corren con datos de ejemplo.
 
+### Pruebas contra la base real
+
+```powershell
+.\mvnw.cmd verify
+```
+
+Corre las pruebas de siempre y además las `*IT` contra TiDB, con tu `config.properties` o las variables `PRECIOGAS_*` (tarda unos 2 min). Sin base configurada se omiten. `mvnw package` (CI y Render) no las corre.
+
+| Prueba | Qué revisa |
+|---|---|
+| `BaseDeDatosIT` | Conexión, columnas del esquema, que haya datos de la CNE de los últimos 7 días, precios en 15–40 $/L, sin duplicados ni huérfanos, mi gasolinera fuera de la competencia y estaciones dentro de `cne.radio.km` |
+| `JdbcDaoIT` | Estaciones del rectángulo con su precio más reciente, `actualizado`, y crear/corregir mis precios (redondeo, fecha, 404) |
+| `CargaCneIT` | El colector guarda, no duplica al cargar dos veces el mismo día y guarda historial por fecha |
+| `ApiRealIT` | Los endpoints de punta a punta: orden y radio de `/competencia`, que `/resumen` cuadre con ella, mis-precios y el token de admin |
+| `CneDescargaIT` | Descarga la CNE real y revisa que el formato no haya cambiado y que mi gasolinera siga apareciendo |
+
+Lo que crean (mis precios de prueba y la estación `PRUEBA/JUNIT/...` con fechas del año 2000) se borra al terminar. Si falla `losPreciosMasRecientesSonDeEstaSemana`, hay que correr el colector.
+
 ### Variables de entorno (Render)
 
 Cada clave de `config.properties` se puede dar como variable `PRECIOGAS_` + la clave en mayúsculas con `_` en vez de punto. Las variables ganan sobre el archivo.
