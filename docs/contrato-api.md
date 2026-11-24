@@ -19,7 +19,7 @@ Estaciones cercanas con sus precios, ordenadas de la más cercana a la más leja
 | Parámetro | Obligatorio | Por omisión |
 |---|---|---|
 | `lat`, `lng` | No | Ubicación de nuestra gasolinera |
-| `radio` (km, mayor que 0 y hasta 100) | No | 10 |
+| `radio` (km, mayor que 0 y hasta 100) | No | 5 |
 | `combustible` | No | Sin filtro: todas las estaciones con todos sus precios |
 
 Con `combustible`, solo vienen las estaciones que venden ese combustible. Una estación puede no tener los tres precios.
@@ -48,7 +48,7 @@ GET /competencia?lat=20.90&lng=-101.30&radio=5&combustible=magna
 
 ## GET /resumen?combustible=magna
 
-Promedio, mínimo y máximo de las estaciones a 10 km de nuestra gasolinera. Nuestra propia estación no entra al promedio. `diferencia` = mi precio menos el promedio (negativo = estoy más barato). Si `combustible` falta, se usa `magna`. Si no hay datos, los números vienen en `null`.
+Promedio, mínimo y máximo de las estaciones a 5 km de nuestra gasolinera. Nuestra propia estación no entra al promedio. `diferencia` = mi precio menos el promedio (negativo = estoy más barato). Si `combustible` falta, se usa `magna`. Si no hay datos, los números vienen en `null`.
 
 ```json
 {
@@ -88,6 +88,6 @@ Para comprobar que la API está viva: `{ "estado": "ok", "fuente": "ejemplo" | "
 
 ## Decisiones del 18 de noviembre
 
-- Radio por omisión: 10 km.
+- Radio por omisión: 5 km.
 - `/resumen` no incluye mi propia estación en el promedio.
 - Estado o municipio que se carga: **pendiente** (depende del archivo de la CNE).

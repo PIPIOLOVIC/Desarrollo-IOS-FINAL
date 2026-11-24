@@ -100,7 +100,7 @@ public final class Config {
     }
 
     public static double radioPorOmision() {
-        return getDouble("radio.default", 10.0);
+        return getDouble("radio.default", 5.0);
     }
 
     /** Zona horaria de la gasolinera, para la fecha de los precios que registro. */
