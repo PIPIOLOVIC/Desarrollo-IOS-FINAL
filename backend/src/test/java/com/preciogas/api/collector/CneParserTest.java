@@ -48,11 +48,11 @@ class CneParserTest {
     void leeEstaciones() throws Exception {
         Map<String, Estacion> l = lugares();
         assertEquals(8, l.size());
-        Estacion e = l.get("4554");
-        assertEquals("PL/2810/EXP/ES/2015", e.permiso());
-        assertEquals("AUTOSERVICIO EL FUERTE SA DE CV", e.nombre());
-        assertEquals(20.3592, e.lat()); // y
-        assertEquals(-102.066, e.lng()); // x
+        Estacion e = l.get("2045");
+        assertEquals("PL/371/EXP/ES/2015", e.permiso());
+        assertEquals("MULTISERVICIOS LA PILARICA SA DE CV", e.nombre());
+        assertEquals(25.7558, e.lat()); // y
+        assertEquals(-108.9685, e.lng()); // x
         assertEquals(0.0, l.get("13014").lat()); // viene en 0,0 en el archivo real
     }
 

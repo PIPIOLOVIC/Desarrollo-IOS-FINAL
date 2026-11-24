@@ -16,10 +16,10 @@ class ColectorTest {
 
     @Test
     void filtraPorRadioYExcluyeMiGasolinera() throws Exception {
-        // Centro de La Piedad, 100 km, excluyendo AUTOSERVICIO EL FUERTE
+        // 100 km alrededor de un punto de prueba, tratando a PL/1395 como si fuera "mi gasolinera"
         Map<String, Estacion> r = porPermiso(Colector.unir(CneParserTest.lugares(), CneParserTest.precios(),
-                20.34, -102.03, 100, "PL/2810/EXP/ES/2015"));
-        assertEquals(java.util.Set.of("PL/1395/EXP/ES/2015", "PL/8668/EXP/ES/2015"), r.keySet());
+                20.34, -102.03, 100, "PL/1395/EXP/ES/2015"));
+        assertEquals(java.util.Set.of("PL/8668/EXP/ES/2015"), r.keySet());
         assertEquals(Map.of("magna", 23.87, "premium", 28.99), r.get("PL/8668/EXP/ES/2015").precios());
     }
 
@@ -37,6 +37,6 @@ class ColectorTest {
         assertEquals(7, todas.size());
         Estacion e10473 = todas.stream().filter(e -> e.lat() == 18.15451).findFirst().orElseThrow();
         assertEquals(Map.of("magna", 22.89, "premium", 26.69), e10473.precios());
-        assertEquals(true, r.containsKey("PL/2810/EXP/ES/2015")); // sin excluir, mi gasolinera sí está
+        assertEquals(true, r.containsKey("PL/1395/EXP/ES/2015")); // sin excluir ninguna, sí está
     }
 }

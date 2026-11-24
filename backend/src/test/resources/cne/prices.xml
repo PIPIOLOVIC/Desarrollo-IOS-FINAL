@@ -29,10 +29,10 @@
     <gas_price type="premium">28.99</gas_price>
     <gas_price type="diesel">25.39</gas_price>
   </place>
-  <place place_id="4554">
-    <gas_price type="regular">23.89</gas_price>
-    <gas_price type="premium">29.29</gas_price>
-    <gas_price type="diesel">26.89</gas_price>
+  <place place_id="2045">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">29.49</gas_price>
+    <gas_price type="diesel">26.99</gas_price>
   </place>
   <place place_id="2725">
     <gas_price type="regular">23.6</gas_price>
