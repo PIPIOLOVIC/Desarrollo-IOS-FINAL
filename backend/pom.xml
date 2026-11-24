@@ -80,6 +80,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <!-- Las pruebas no leen el config.properties local (con la base real): siempre datos de ejemplo -->
+                    <environmentVariables>
+                        <PRECIOGAS_CONFIG>${project.basedir}/src/test/resources/config-pruebas.properties</PRECIOGAS_CONFIG>
+                        <PRECIOGAS_DB_URL></PRECIOGAS_DB_URL>
+                        <PRECIOGAS_DB_HOST></PRECIOGAS_DB_HOST>
+                    </environmentVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

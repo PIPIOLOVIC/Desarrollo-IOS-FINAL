@@ -68,18 +68,35 @@ public final class Config {
         }
     }
 
-    /** true si hay datos de conexión a la base; si no, la API usa datos de ejemplo. */
+    /** true si hay datos de conexión a la base (db.url o db.host); si no, la API usa datos de ejemplo. */
     public static boolean hayBaseDeDatos() {
-        return get("db.url", null) != null;
+        return get("db.url", null) != null || get("db.host", null) != null;
     }
+
+    /** Valores de ejemplo, no son una gasolinera real: el colector se niega a cargar con ellos. */
+    public static final double MI_LAT_POR_OMISION = 20.90;
+    public static final double MI_LNG_POR_OMISION = -101.30;
 
     /** Ubicación de nuestra gasolinera (centro para /resumen y valor por omisión de /competencia). */
     public static double miLat() {
-        return getDouble("mi.lat", 20.90);
+        return getDouble("mi.lat", MI_LAT_POR_OMISION);
     }
 
     public static double miLng() {
-        return getDouble("mi.lng", -101.30);
+        return getDouble("mi.lng", MI_LNG_POR_OMISION);
+    }
+
+    /** Permiso CNE de nuestra gasolinera: el colector no la guarda, así no entra al promedio de /resumen. */
+    public static String miPermiso() {
+        return get("mi.permiso", null);
+    }
+
+    /**
+     * Radio en km alrededor de mi gasolinera dentro del cual el colector guarda estaciones.
+     * 100 km = el radio máximo que acepta /competencia, para que nunca quede corta.
+     */
+    public static double cneRadioKm() {
+        return getDouble("cne.radio.km", 100.0);
     }
 
     public static double radioPorOmision() {
