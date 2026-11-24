@@ -8,6 +8,9 @@ final class ResumenViewModel {
 
     var combustibleSeleccionado: Combustible = .magna
     var resumen: ResumenDTO?
+    /// Fecha de la última carga de datos de la CNE, lista para mostrar.
+    var actualizado: String = ""
+    var sinConexion = false
     var cargando = false
     var mensajeError: String?
 
@@ -21,9 +24,22 @@ final class ResumenViewModel {
         defer { cargando = false }
 
         do {
-            resumen = try await repository.obtenerResumen(combustible: combustibleSeleccionado)
+            let respuesta = try await repository.obtenerResumen(combustible: combustibleSeleccionado)
+            resumen = respuesta.valor
+            sinConexion = respuesta.desdeCache
+        } catch is CancellationError {
+            return
         } catch {
             mensajeError = error.localizedDescription
+            return
+        }
+
+        // /resumen no trae fecha; se toma la de /competencia (misma carga de la CNE).
+        if let competencia = try? await repository.obtenerCompetencia(
+            combustible: combustibleSeleccionado,
+            radioKm: CompetenciaViewModel.radioCercanasKm
+        ) {
+            actualizado = Formato.fechaVisible(competencia.valor.actualizado)
         }
     }
 }

@@ -24,16 +24,24 @@ struct ActualizarPreciosSheet: View {
                 Section {
                     PrimaryButton(titulo: "Guardar precios", icono: "checkmark", habilitado: esValido) {
                         Task {
-                            await viewModel.actualizarPrecios(
+                            let guardado = await viewModel.actualizarPrecios(
                                 magna: parsear(magnaTexto),
                                 premium: parsear(premiumTexto),
                                 diesel: parsear(dieselTexto)
                             )
-                            dismiss()
+                            if guardado { dismiss() }
                         }
                     }
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
+                }
+
+                if let error = viewModel.mensajeError {
+                    Section {
+                        EstadoDatosBanner(mensajeError: error)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                    }
                 }
             }
             .navigationTitle("Actualizar precios")

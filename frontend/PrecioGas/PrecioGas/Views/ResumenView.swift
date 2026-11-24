@@ -34,6 +34,8 @@ struct ResumenView: View {
                 .pickerStyle(.segmented)
                 .tint(AppTheme.principal)
 
+                EstadoDatosBanner(sinConexion: viewModel.sinConexion, mensajeError: viewModel.mensajeError)
+
                 if let resumen = viewModel.resumen {
                     // Tarjeta principal: Mi precio vs promedio
                     ZStack {
@@ -135,7 +137,7 @@ struct ResumenView: View {
                             .font(.subheadline)
                             .foregroundStyle(AppTheme.texto)
 
-                        Text("Actualizado: 19 nov 2026, 06:00 h")
+                        Text("Actualizado: \(viewModel.actualizado.isEmpty ? "--" : viewModel.actualizado)")
                             .font(.caption)
                             .foregroundStyle(AppTheme.secundario)
                     }

@@ -28,13 +28,19 @@ struct MiGasolineraView: View {
                             .fontWeight(.bold)
                             .foregroundStyle(AppTheme.texto)
 
-                        Text("Actualizado: \(viewModel.fechaUltimaActualizacion.isEmpty ? "19 nov 2026, 06:00 h" : viewModel.fechaUltimaActualizacion)")
+                        Text("Actualizado: \(viewModel.fechaUltimaActualizacion.isEmpty ? "--" : viewModel.fechaUltimaActualizacion)")
                             .font(.footnote)
                             .foregroundStyle(AppTheme.secundario)
                     }
 
                     Spacer()
                 }
+
+                EstadoDatosBanner(
+                    sinConexion: viewModel.sinConexion,
+                    mensajeError: viewModel.mensajeError,
+                    mensajeInfo: viewModel.mensajeInfo
+                )
 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                     HStack(alignment: .firstTextBaseline) {
@@ -100,6 +106,9 @@ struct MiGasolineraView: View {
             ActualizarPreciosSheet(viewModel: viewModel)
         }
         .task {
+            await viewModel.cargar()
+        }
+        .refreshable {
             await viewModel.cargar()
         }
     }

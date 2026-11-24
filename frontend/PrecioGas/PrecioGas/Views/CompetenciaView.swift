@@ -21,6 +21,15 @@ struct CompetenciaView: View {
                         .foregroundStyle(AppTheme.texto)
                 }
                 .tint(AppTheme.principal)
+
+                EstadoDatosBanner(sinConexion: viewModel.sinConexion, mensajeError: viewModel.mensajeError)
+
+                if !viewModel.actualizado.isEmpty {
+                    Text("Datos de la CNE: \(viewModel.actualizado)")
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.secundario)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
             .padding(.horizontal, AppTheme.Spacing.md)
             .padding(.vertical, AppTheme.Spacing.sm)
@@ -51,6 +60,9 @@ struct CompetenciaView: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+            .refreshable {
+                await viewModel.cargar()
+            }
             .background(AppTheme.fondo)
         }
         .background(AppTheme.fondo)

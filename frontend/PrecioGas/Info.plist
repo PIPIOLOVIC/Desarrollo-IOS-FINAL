@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- URL base de la API. Se puede cambiar sin tocar código con el argumento de arranque -apiBaseURL. -->
+	<key>PrecioGasAPIBaseURL</key>
+	<string>http://localhost:8080/api</string>
+	<!-- Solo para desarrollo: permite http:// hacia localhost y la red local (Tomcat sin TLS). -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+</dict>
+</plist>
