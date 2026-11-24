@@ -1,13 +1,14 @@
 package com.preciogas.api.dao;
 
+import com.preciogas.api.config.Config;
+
 /**
- * Elige la fuente de datos una sola vez al arrancar.
- * Por ahora siempre datos de ejemplo; cuando exista JdbcDao se usará si
- * Config.hayBaseDeDatos() es true.
+ * Elige la fuente de datos una sola vez al arrancar: TiDB (JdbcDao) si
+ * Config.hayBaseDeDatos() es true; si no, datos de ejemplo en memoria.
  */
 public final class Daos {
 
-    private static final PreciosDao INSTANCIA = new EjemploDao();
+    private static final PreciosDao INSTANCIA = Config.hayBaseDeDatos() ? new JdbcDao() : new EjemploDao();
 
     private Daos() {
     }
