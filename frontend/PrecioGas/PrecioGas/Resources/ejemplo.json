@@ -1,0 +1,81 @@
+{
+  "competencia": {
+    "actualizado": "2026-11-19T12:00:00Z",
+    "estaciones": [
+      {
+        "id": 101,
+        "permiso": "PL/10214/EXP/ES/2015",
+        "nombre": "Pemex Insurgentes Sur",
+        "marca": "Pemex",
+        "direccion": "Av. Insurgentes Sur 318, Col. Roma Norte, Cuauhtémoc, 06700 Ciudad de México, CDMX",
+        "lat": 19.420,
+        "lng": -99.163,
+        "distanciaKm": 0.9,
+        "precios": { "magna": 23.35, "premium": 25.20, "diesel": 24.65 }
+      },
+      {
+        "id": 102,
+        "permiso": "PL/19482/EXP/ES/2016",
+        "nombre": "Shell Paseo de la Reforma",
+        "marca": "Shell",
+        "direccion": "Av. Paseo de la Reforma 412, Col. Juárez, Cuauhtémoc, 06600 Ciudad de México, CDMX",
+        "lat": 19.427,
+        "lng": -99.167,
+        "distanciaKm": 1.4,
+        "precios": { "magna": 23.69, "premium": 25.25, "diesel": 24.80 }
+      },
+      {
+        "id": 103,
+        "permiso": "PL/20541/EXP/ES/2018",
+        "nombre": "Mobil Polanco",
+        "marca": "Mobil",
+        "direccion": "Av. Presidente Masaryk 215, Polanco, Miguel Hidalgo, 11560 Ciudad de México, CDMX",
+        "lat": 19.432,
+        "lng": -99.190,
+        "distanciaKm": 2.3,
+        "precios": { "magna": 23.50, "premium": 25.40, "diesel": 24.90 }
+      },
+      {
+        "id": 104,
+        "permiso": "PL/21890/EXP/ES/2019",
+        "nombre": "Oxxo Gas Chapultepec",
+        "marca": "Oxxo Gas",
+        "direccion": "Av. Chapultepec 490, Col. Roma Norte, Cuauhtémoc, 06700 Ciudad de México, CDMX",
+        "lat": 19.422,
+        "lng": -99.172,
+        "distanciaKm": 3.1,
+        "precios": { "magna": 23.29, "premium": 25.10 }
+      },
+      {
+        "id": 105,
+        "permiso": "PL/23410/EXP/ES/2020",
+        "nombre": "BP Mariano Escobedo",
+        "marca": "BP",
+        "direccion": "Calz. Gral. Mariano Escobedo 510, Anzures, Miguel Hidalgo, 11590 Ciudad de México, CDMX",
+        "lat": 19.434,
+        "lng": -99.181,
+        "distanciaKm": 4.4,
+        "precios": { "magna": 23.85, "premium": 25.75, "diesel": 25.15 }
+      },
+      {
+        "id": 106,
+        "permiso": "PL/25109/EXP/ES/2021",
+        "nombre": "Estación Periférico Norte",
+        "marca": "G500",
+        "direccion": "Blvd. Manuel Ávila Camacho 145, Lomas de Chapultepec, 11000 Ciudad de México, CDMX",
+        "lat": 19.448,
+        "lng": -99.210,
+        "distanciaKm": 6.8,
+        "precios": { "magna": 22.90, "premium": 24.95, "diesel": 24.40 }
+      }
+    ]
+  },
+  "misPrecios": [
+    { "id": 4, "combustible": "magna", "precio": 23.50, "fecha": "2026-11-19" },
+    { "id": 5, "combustible": "premium", "precio": 25.40, "fecha": "2026-11-19" },
+    { "id": 6, "combustible": "diesel", "precio": 24.80, "fecha": "2026-11-19" },
+    { "id": 1, "combustible": "magna", "precio": 23.40, "fecha": "2026-11-17" },
+    { "id": 2, "combustible": "premium", "precio": 25.30, "fecha": "2026-11-17" },
+    { "id": 3, "combustible": "diesel", "precio": 24.70, "fecha": "2026-11-17" }
+  ]
+}
