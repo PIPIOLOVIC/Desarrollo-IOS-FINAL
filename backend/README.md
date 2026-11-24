@@ -51,6 +51,7 @@ Cada clave de `config.properties` se puede dar como variable `PRECIOGAS_` + la c
 | `PRECIOGAS_MI_LAT` / `PRECIOGAS_MI_LNG` | `20.90` / `-101.30` (ejemplo) | Ubicación de nuestra gasolinera |
 | `PRECIOGAS_MI_PERMISO` | | Permiso CNE de nuestra gasolinera (no se guarda como competencia) |
 | `PRECIOGAS_CNE_RADIO_KM` | `100` | Radio de carga del colector |
+| `PRECIOGAS_COLECTOR_PROGRAMADO` / `PRECIOGAS_COLECTOR_HORA` | `false` / `07:00` | Corrida diaria automática del colector |
 | `PRECIOGAS_ZONA` | `America/Mexico_City` | Zona horaria de las fechas |
 
 ## Colector de la CNE
@@ -85,7 +86,11 @@ SELECT COUNT(*) FROM estacion;
 SELECT fecha, combustible, COUNT(*), ROUND(AVG(precio), 2) FROM precio GROUP BY fecha, combustible;
 ```
 
-No hay descarga programada: en el plan gratuito de Render el servicio se apaga por inactividad, así que el colector se corre a mano con el endpoint.
+### Corrida diaria automática
+
+Con `colector.programado=true` (y base configurada), al arrancar Tomcat se programa el colector todos los días a `colector.hora` (07:00 por omisión, zona `America/Mexico_City`). Lo hace `ColectorProgramado`, un `ServletContextListener` con `ScheduledExecutorService`. En el log de Tomcat aparece `[Colector] Programado todos los días a las 07:00 ...`. Si una corrida falla (por ejemplo, TiDB no responde), se registra y la del día siguiente corre igual.
+
+Está apagado por omisión. Solo sirve si el servidor sigue encendido: en el plan gratuito de Render el servicio se apaga por inactividad, así que ahí se usa el endpoint manual.
 
 ## Contrato
 
@@ -120,4 +125,4 @@ curl.exe -X POST -H "Content-Type: application/json" -d '{\"combustible\":\"magn
 - `service`: `PreciosService` (filtro por radio con Haversine y cálculo del resumen).
 - `dao`: interfaz `PreciosDao`; `EjemploDao` en memoria (luego `JdbcDao` para TiDB).
 - `model`: `Estacion`, `MiPrecio`, `Resumen`, `Competencia`, etc.
-- `collector`: colector de la CNE: `CneClient` (descarga), `CneParser` (StAX), `Colector` (une, filtra, respaldo) y `CargaCne` (guarda en TiDB).
+- `collector`: colector de la CNE: `CneClient` (descarga), `CneParser` (StAX), `Colector` (une, filtra, respaldo), `CargaCne` (guarda en TiDB) y `ColectorProgramado` (corrida diaria).
