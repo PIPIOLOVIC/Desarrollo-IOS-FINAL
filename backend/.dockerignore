@@ -1,0 +1,9 @@
+# Nunca meter credenciales ni archivos locales en la imagen
+src/main/resources/config.properties
+**/config.properties
+target
+nb-configuration.xml
+nbactions.xml
+nbproject
+.idea
+*.iml

@@ -2,7 +2,7 @@
 
 API REST en Java para la app PrecioGas: Maven web, JAX-RS (Jersey 3.1), Jackson, Tomcat 10.1 y TiDB (driver MySQL).
 
-**Estado actual:** los endpoints de lectura y `/mis-precios` responden con **datos de ejemplo en memoria** (no son datos reales) hasta que exista `JdbcDao`. El colector de la CNE ya guarda datos reales en TiDB (`POST /api/admin/actualizar`, ver abajo).
+**Estado actual:** con base configurada, todos los endpoints leen y guardan en TiDB (`JdbcDao`) y `/salud` responde `"fuente":"bd"`. El colector de la CNE carga los datos reales (`POST /api/admin/actualizar`, ver abajo). Sin base, la API responde con datos de ejemplo en memoria (`"fuente":"ejemplo"`).
 
 ## Requisitos
 
@@ -36,6 +36,24 @@ Sin `db.host` (ni `db.url`) la API usa los datos de ejemplo. En código, la cone
 
 Las pruebas (`mvnw test`) **no** leen tu `config.properties`: usan `src/test/resources/config-pruebas.properties` (sin base), así que siempre corren con datos de ejemplo.
 
+### Pruebas contra la base real
+
+```powershell
+.\mvnw.cmd verify
+```
+
+Corre las pruebas de siempre y además las `*IT` contra TiDB, con tu `config.properties` o las variables `PRECIOGAS_*` (tarda unos 2 min). Sin base configurada se omiten. `mvnw package` (CI y Render) no las corre.
+
+| Prueba | Qué revisa |
+|---|---|
+| `BaseDeDatosIT` | Conexión, columnas del esquema, que haya datos de la CNE de los últimos 7 días, precios en 15–40 $/L, sin duplicados ni huérfanos, mi gasolinera fuera de la competencia y estaciones dentro de `cne.radio.km` |
+| `JdbcDaoIT` | Estaciones del rectángulo con su precio más reciente, `actualizado`, y crear/corregir mis precios (redondeo, fecha, 404) |
+| `CargaCneIT` | El colector guarda, no duplica al cargar dos veces el mismo día y guarda historial por fecha |
+| `ApiRealIT` | Los endpoints de punta a punta: orden y radio de `/competencia`, que `/resumen` cuadre con ella, mis-precios y el token de admin |
+| `CneDescargaIT` | Descarga la CNE real y revisa que el formato no haya cambiado y que mi gasolinera siga apareciendo |
+
+Lo que crean (mis precios de prueba y la estación `PRUEBA/JUNIT/...` con fechas del año 2000) se borra al terminar. Si falla `losPreciosMasRecientesSonDeEstaSemana`, hay que correr el colector.
+
 ### Variables de entorno (Render)
 
 Cada clave de `config.properties` se puede dar como variable `PRECIOGAS_` + la clave en mayúsculas con `_` en vez de punto. Las variables ganan sobre el archivo.
@@ -53,6 +71,16 @@ Cada clave de `config.properties` se puede dar como variable `PRECIOGAS_` + la c
 | `PRECIOGAS_CNE_RADIO_KM` | `100` | Radio de carga del colector |
 | `PRECIOGAS_COLECTOR_PROGRAMADO` / `PRECIOGAS_COLECTOR_HORA` | `false` / `07:00` | Corrida diaria automática del colector |
 | `PRECIOGAS_ZONA` | `America/Mexico_City` | Zona horaria de las fechas |
+
+### Publicar en Render
+
+Render no tiene Java nativo, así que usa el `Dockerfile` de esta carpeta (lo construye Render; no hace falta Docker en tu PC). La imagen no lleva `config.properties` (`.dockerignore`): todo llega por variables de entorno.
+
+1. En Render: **New → Web Service**, conecta el repositorio, **Language: Docker**, **Root Directory: `backend`**.
+2. En **Environment** agrega las variables de la tabla de arriba (al menos `PRECIOGAS_DB_HOST`, `PRECIOGAS_DB_SSL=true`, `PRECIOGAS_DB_USER`, `PRECIOGAS_DB_PASSWORD`, `PRECIOGAS_ADMIN_TOKEN`, `PRECIOGAS_MI_LAT`, `PRECIOGAS_MI_LNG`, `PRECIOGAS_MI_PERMISO`). El puerto lo pone Render (`PORT`).
+3. Al terminar el despliegue: `https://<tu-servicio>.onrender.com/api/salud` debe responder `"fuente":"bd"`. Esa es la base que usa la app iOS (con `https://` no hace falta la excepción de App Transport Security).
+
+En el plan gratuito el servicio se duerme tras 15 min sin uso y la primera petición tarda unos 50 s en despertarlo: abrir `/salud` antes de la demo. TiDB Cloud acepta conexiones desde cualquier IP solo si así está configurado en su panel (Networking).
 
 ## Colector de la CNE
 
@@ -123,6 +151,6 @@ curl.exe -X POST -H "Content-Type: application/json" -d '{\"combustible\":\"magn
 - `config`: `ApiApplication` (`/api`), configuración de Jackson, lectura de `config.properties` (`Config`) y conexión a la base (`Db`).
 - `resource`: un recurso por endpoint y `ErrorMapper` para el formato de errores.
 - `service`: `PreciosService` (filtro por radio con Haversine y cálculo del resumen).
-- `dao`: interfaz `PreciosDao`; `EjemploDao` en memoria (luego `JdbcDao` para TiDB).
+- `dao`: interfaz `PreciosDao`; `JdbcDao` (TiDB) y `EjemploDao` (en memoria, sin base). `Daos` elige uno al arrancar.
 - `model`: `Estacion`, `MiPrecio`, `Resumen`, `Competencia`, etc.
 - `collector`: colector de la CNE: `CneClient` (descarga), `CneParser` (StAX), `Colector` (une, filtra, respaldo), `CargaCne` (guarda en TiDB) y `ColectorProgramado` (corrida diaria).
