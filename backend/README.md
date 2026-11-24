@@ -109,8 +109,8 @@ Base `http://<host>:8080/api`, JSON UTF-8, fechas ISO 8601, precios en pesos por
 | Método | Ruta | Qué hace |
 |---|---|---|
 | GET | `/salud` | Comprueba que la API está viva y qué fuente usa (`ejemplo` o `bd`) |
-| GET | `/competencia?lat=&lng=&radio=&combustible=` | Estaciones cercanas ordenadas por distancia. Todo opcional: sin lat/lng usa mi gasolinera, radio 5 km, sin combustible trae todos los precios |
-| GET | `/resumen?combustible=magna` | Promedio, mínimo, máximo de la zona (5 km) y diferencia de mi precio contra el promedio (negativo = más barato) |
+| GET | `/competencia?lat=&lng=&radio=&combustible=` | Estaciones cercanas ordenadas por distancia. Todo opcional: sin lat/lng usa mi gasolinera, radio 10 km, sin combustible trae todos los precios |
+| GET | `/resumen?combustible=magna` | Promedio, mínimo, máximo de la zona (10 km) y diferencia de mi precio contra el promedio (negativo = más barato) |
 | GET | `/mis-precios` | Mis precios, del más reciente al más antiguo |
 | POST | `/mis-precios` | Cuerpo `{"combustible":"magna","precio":23.50}` → 201 con el registro |
 | PUT | `/mis-precios/{id}` | Cuerpo `{"precio":23.60}` → 200 con el registro, 404 si no existe |
@@ -118,7 +118,7 @@ Base `http://<host>:8080/api`, JSON UTF-8, fechas ISO 8601, precios en pesos por
 
 Los cuerpos JSON pueden traer campos de más (por ejemplo `id` o `fecha`): se ignoran. La fecha de un precio nuevo la pone el servidor con la zona `America/Mexico_City`.
 
-Decisiones tomadas (para confirmar con el equipo): radio por omisión 5 km, y `/resumen` **no** incluye mi propia estación en el promedio.
+Decisiones tomadas (para confirmar con el equipo): radio por omisión 10 km, y `/resumen` **no** incluye mi propia estación en el promedio.
 
 ## Pruebas con curl
 
