@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- URL base de la API. Se puede cambiar sin tocar código con el argumento de arranque -apiBaseURL. -->
+	<!-- URL base de la API (publicada en Render). Para usar un Tomcat local, argumento de arranque -apiBaseURL http://localhost:8080/api -->
 	<key>PrecioGasAPIBaseURL</key>
-	<string>http://localhost:8080/api</string>
-	<!-- Solo para desarrollo: permite http:// hacia localhost y la red local (Tomcat sin TLS). -->
+	<string>https://preciogas-api.onrender.com/api</string>
+	<!-- Solo para desarrollo con Tomcat local: permite http:// hacia localhost y la red local. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
