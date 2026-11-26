@@ -38,13 +38,13 @@ enum APIError: LocalizedError, Equatable {
 /// Configuración de la API.
 ///
 /// La URL base se toma, en orden, de:
-/// 1. El argumento de arranque `-apiBaseURL http://192.168.1.50:8080/api`
+/// 1. El argumento de arranque `-apiBaseURL http://localhost:8080/api`
 ///    (Product > Scheme > Edit Scheme > Arguments) o de `UserDefaults`.
 /// 2. La clave `PrecioGasAPIBaseURL` del Info.plist.
-/// 3. `http://localhost:8080/api`, que funciona en el simulador con Tomcat local.
+/// 3. La API publicada en Render.
 enum APIConfig {
     static let claveBaseURL = "apiBaseURL"
-    static let urlPorOmision = "http://localhost:8080/api"
+    static let urlPorOmision = "https://preciogas-api.onrender.com/api"
 
     static var baseURL: URL {
         let candidatos = [
@@ -71,7 +71,8 @@ final class APIClient {
             self.session = session
         } else {
             let config = URLSessionConfiguration.default
-            config.timeoutIntervalForRequest = 10
+            // Render (plan gratuito) tarda hasta ~50 s en despertar tras 15 min sin uso.
+            config.timeoutIntervalForRequest = 60
             config.waitsForConnectivity = false
             self.session = URLSession(configuration: config)
         }
